@@ -1,7 +1,6 @@
 ﻿using ApplicationAPI.Helpers;
 using ApplicationAPI.Models;
 using ApplicationDB.Helper;
-using ApplicationDB.Models;
 using ApplicationDB.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -19,7 +18,11 @@ namespace ApplicationAPI.Controllers
             this.applicationRepositiry = applicationRepositiry;
         }
 
-        // Создание
+        /// <summary>
+        /// Создание новой заявки.
+        /// </summary>
+        /// <param name="request">Модель заявки</param>
+        /// <returns>Созданна заявка или ошибка.</returns>
         [HttpPost]
         public ActionResult<ApplicationApiModel> CreateApplication(ApplicationApiModel request)
         {
@@ -45,7 +48,11 @@ namespace ApplicationAPI.Controllers
             return BadRequest(ModelState);
         }
 
-        // Редактирование
+        /// <summary>
+        /// Редактироание.
+        /// </summary>
+        /// <param name="id">Id заявки.</param>
+        /// <returns>Отредактированная заявка или ошибка.</returns>
         [HttpPut("{id}")]
         public ActionResult<ApplicationApiModel> UpdateApplication(Guid id)
         {
@@ -60,6 +67,7 @@ namespace ApplicationAPI.Controllers
 
             return Ok(application);
         }
+
 
         [HttpPost]
         public ActionResult<ApplicationApiModel> UpdateApplication(ApplicationApiModel request)
@@ -85,7 +93,11 @@ namespace ApplicationAPI.Controllers
             return Ok(application);
         }
 
-        // Удаление
+        /// <summary>
+        /// Удаление.
+        /// </summary>
+        /// <param name="id">Id заявки.</param>
+        /// <returns>Успешное удаление или ошибка.</returns>
         [HttpDelete("{id}")]
         public ActionResult DeleteApplication(Guid id)
         {
@@ -104,7 +116,11 @@ namespace ApplicationAPI.Controllers
             return Ok();
         }
 
-        // Отправка заявки на рассмотрение
+        /// <summary>
+        /// Отправка на рассмотрение.
+        /// </summary>
+        /// <param name="id">Id заявки.</param>
+        /// <returns>Успешная отправка или ошибка.</returns>
         [HttpPost("{id}/submit")]
         public ActionResult SubmitApplication(Guid id)
         {
@@ -137,7 +153,11 @@ namespace ApplicationAPI.Controllers
             return Ok();
         }
 
-        // Получение заявок поданных после указанной даты
+        /// <summary>
+        /// Получение заявок поданных после указанной даты.
+        /// </summary>
+        /// <param name="submittedAfter">Дата для фильтрации.</param>
+        /// <returns>Список заявок или ошибка.</returns>
         [HttpGet]
         public ActionResult<IEnumerable<ApplicationApiModel>> GetApplications([FromQuery] DateTime submittedAfter)
         {
@@ -145,14 +165,11 @@ namespace ApplicationAPI.Controllers
             return Ok(application);
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<ApplicationApiModel>> GetAll()
-        {
-            var application = applicationRepositiry.GetAll();
-            return Ok(application);
-        }
-
-        // Получение заявок не поданных и старше определенной даты
+        /// <summary>
+        /// Получение заявок не поданных и старше определенной даты.
+        /// </summary>
+        /// <param name="unsubmittedOlder">Дата для фильтрации.</param>
+        /// <returns>Список заявок или ошибка.</returns>
         [HttpGet]
         public ActionResult<IEnumerable<ApplicationApiModel>> GetUnsubmittedApplications([FromQuery] DateTime unsubmittedOlder)
         {
@@ -160,7 +177,11 @@ namespace ApplicationAPI.Controllers
             return Ok(application);
         }
 
-        // Получение текущей не поданной заявки для указанного пользователя
+        /// <summary>
+        /// Получение текущей не поданной заявки для указанного пользователя.
+        /// </summary>
+        /// <param name="userId">Id пользователя.</param>
+        /// <returns>Текущая заявка или ошибка.</returns>
         [HttpGet("users/{userId}/currentapplication")]
         public ActionResult<ApplicationApiModel> GetCurrentApplication(Guid userId)
         {
@@ -173,7 +194,11 @@ namespace ApplicationAPI.Controllers
             return Ok(application);
         }
 
-        // Получение заявки по идентификатору
+        /// <summary>
+        /// Получение заявки по id.
+        /// </summary>
+        /// <param name="id">Id заявки.</param>
+        /// <returns>Заявка или ошибка.</returns>
         [HttpGet("{id}")]
         public ActionResult<ApplicationApiModel> GetApplicationById(Guid id)
         {
@@ -186,7 +211,10 @@ namespace ApplicationAPI.Controllers
             return Ok(application);
         }
 
-        // Получение списка возможных типов активности
+        /// <summary>
+        /// Получение списка возможных типов активности.
+        /// </summary>
+        /// <returns>Список возможных типов активности.</returns>
         [HttpGet("activities")]
         public ActionResult<IEnumerable<string>> GetActivityTypes()
         {
