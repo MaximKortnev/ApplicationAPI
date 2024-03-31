@@ -30,7 +30,7 @@
 
 *dotnet run*
 
-> После этого API будет доступен по адресу https://localhost:5001/ (или http://localhost:5000/).
+> После этого API будет доступен по адресу > После этого API будет доступен по адресу https://localhost:7287/swagger/index.html.
 
 # API Endpoints
 - Создание заявки: POST /Application/CreateApplication
