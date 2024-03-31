@@ -6,6 +6,7 @@ namespace ApplicationAPI.Models
     public class ApplicationApiModel
     {
         public Guid Id { get; set; }
+        [Required(ErrorMessage = "Укажите id пользователя")]
         public Guid UserId { get; set; }
         public TypeActivityApiEnum? Activity { get; set; }
 
@@ -18,6 +19,6 @@ namespace ApplicationAPI.Models
 
         [Required(ErrorMessage = "Укажите план")]
         [StringLength(1000, MinimumLength = 1, ErrorMessage = "Название должно быть не более 1000 символов")]
-        public string? Plan { get; set; }
+        public string? Outline { get; set; }
     }
 }

@@ -12,53 +12,80 @@ namespace ApplicationAPI.Controllers
     [Route("[controller]/[Action]")]
     public class ApplicationController : ControllerBase
     {
-        private readonly IApplicationsPerository applicationRepositiry;
+        private readonly IApplicationsRepository applicationRepositiry;
 
-        public ApplicationController(IApplicationsPerository applicationRepositiry) 
+        public ApplicationController(IApplicationsRepository applicationRepositiry) 
         {
             this.applicationRepositiry = applicationRepositiry;
         }
-        // Создание заявки
+
+        // Создание
         [HttpPost]
         public ActionResult<ApplicationApiModel> CreateApplication(ApplicationApiModel request)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || request.UserId == Guid.Empty)
             {
+                ModelState.AddModelError("UserId", "Не указан id пользователя");
                 return BadRequest(ModelState);
             }
-
-            var application = new Application
+            if (request.Name == null && request.Description == null && request.Activity == null && request.Outline == null) {
+                ModelState.AddModelError("UserId", "Заполните хотя бы одно поле");
+                return BadRequest(ModelState);
+            }
+            var app = applicationRepositiry.TryGetByUserId(request.UserId);
+            if (app == null)
             {
-                Id = Guid.NewGuid(),
-                UserId = request.UserId,
-                Activity = (TypeActivity)request.Activity,
-                Name = request.Name,
-                Description = request.Description,
-                Plan = request.Plan,
-                Status = (Status)1
-            };
+                var application = request.ToApplicationDbModel();
 
-            applicationRepositiry.Add(application);
+                applicationRepositiry.Add(application);
+                return CreatedAtAction(nameof(GetApplicationById), new { id = application.Id }, application);
+            }
 
-            return CreatedAtAction(nameof(GetApplicationById), new { id = application.Id }, application);
+            ModelState.AddModelError("UserId", "Заявка уже существует для указанного пользователя.");
+            return BadRequest(ModelState);
         }
 
-        // Редактирование заявки
+        // Редактирование
         [HttpPut("{id}")]
         public ActionResult<ApplicationApiModel> UpdateApplication(Guid id)
         {
             var application = applicationRepositiry.GetAll().FirstOrDefault(x => x.Id == id);
 
             if (application == null)
+                return NotFound();
+            if (application.Status == (Status)2) {
+                ModelState.AddModelError("UserId", "Заявка уже отправлена, ее нельзя отредактировать.");
+                return BadRequest(ModelState);
+            }
+
+            return Ok(application);
+        }
+
+        [HttpPost]
+        public ActionResult<ApplicationApiModel> UpdateApplication(ApplicationApiModel request)
+        {
+            if (!ModelState.IsValid || request.UserId == Guid.Empty)
+            {
+                ModelState.AddModelError("UserId", "Не указан id пользователя");
+                return BadRequest(ModelState);
+            }
+            if (request.Name == null && request.Description == null && request.Activity == null && request.Outline == null)
+            {
+                ModelState.AddModelError("UserId", "Заполните хотя бы одно поле");
+                return BadRequest(ModelState);
+            }
+            var application = applicationRepositiry.GetAll().FirstOrDefault(x => x.Id == request.Id);
+
+            if (application == null)
             {
                 return NotFound();
             }
 
-            applicationRepositiry.Update(application);
+            applicationRepositiry.Update(request.ToApplicationDbModel());
             return Ok(application);
         }
 
-        // Удаление заявки
+        // Удаление
         [HttpDelete("{id}")]
         public ActionResult DeleteApplication(Guid id)
         {
@@ -66,6 +93,11 @@ namespace ApplicationAPI.Controllers
             if (application == null)
             {
                 return NotFound();
+            }
+            if (application.Status == (Status)2)
+            {
+                ModelState.AddModelError("UserId", "Заявка уже отправлена, ее нельзя удалить.");
+                return BadRequest(ModelState);
             }
 
             applicationRepositiry.Delete(id);
@@ -78,11 +110,30 @@ namespace ApplicationAPI.Controllers
         {
             var application = applicationRepositiry.GetAll().FirstOrDefault(x => x.Id == id);
             if (application == null)
-            {
                 return NotFound();
+            if (application.Name.Length > 100)
+            {
+                ModelState.AddModelError("UserId", "Название должно быть не больше 100 символов.");
+                return BadRequest(ModelState);
+            }
+            if (application.Description.Length > 300)
+            {
+                ModelState.AddModelError("UserId", "Описание должно быть не больше 300 символов.");
+                return BadRequest(ModelState);
+            }
+            if (application.Outline.Length > 1000)
+            {
+                ModelState.AddModelError("UserId", "План должен быть не больше 1000 символов.");
+                return BadRequest(ModelState);
+            }
+            if (application.Name == null && application.Activity == null && application.Outline == null)
+            {
+                ModelState.AddModelError("UserId", "Заполните все обязательные поля");
+                return BadRequest(ModelState);
             }
 
             application.Status = (Status)2;
+            applicationRepositiry.Update(application);
             return Ok();
         }
 

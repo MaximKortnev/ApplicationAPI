@@ -4,15 +4,15 @@ namespace ApplicationAPI.Helpers
 {
     public enum TypeActivityApiEnum
     {
-        Default = 0,
+        Default,
 
         [Display(Name = "Доклад, 35-45 минут")]
-        Report = 1,
+        Report,
 
         [Display(Name = "Мастеркласс, 1-2 часа")]
-        MasterClass = 2,
+        MasterClass,
 
         [Display(Name = "Дискуссия / круглый стол, 40-50 минут")]
-        Discussion = 3
+        Discussion
     }
 }

@@ -3,7 +3,7 @@ using ApplicationDB.Models;
 
 namespace ApplicationDB.Services
 {
-    public interface IApplicationsPerository
+    public interface IApplicationsRepository
     {
         List<Application> GetAll();
         Application TryGetById(Guid id);
