@@ -14,7 +14,7 @@ namespace ApplicationDB
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseNpgsql("Host=localhost;Database=ApplicationApi;Username=postgres;Password=1Qazxcdews2");
+            => optionsBuilder.UseNpgsql("Host=localhost;Database=ApplicationApi;Username=postgres;Password=postgres");
     }
 
 }
