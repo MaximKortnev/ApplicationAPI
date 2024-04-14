@@ -1,0 +1,608 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Application</name>
+    </assembly>
+    <members>
+        <member name="T:Application.Api.Controllers.ApplicationController">
+            <summary>
+            Контроллер для работы с заявками.
+            </summary>
+        </member>
+        <member name="M:Application.Api.Controllers.ApplicationController.#ctor(Application.DataAccess.Services.IApplicationsRepository,Application.Application.Helpers.IMappings,Application.Contracts.ActivityDto,Application.Application.Helpers.Validator)">
+            <summary>
+            Инициализирует новый экземпляр контроллера ApplicationController.
+            </summary>
+            <param name="applicationRepository">Репозиторий заявок.</param>
+            <param name="mapper">Маппер для преобразования моделей.</param>
+            <param name="activityDto">DTO для типов активности.</param>
+            <param name="validator">Валидатор заявок.</param>
+        </member>
+        <member name="M:Application.Api.Controllers.ApplicationController.Create(Application.Application.Models.ApplicationApiModel)">
+            <summary>
+            Создание новой заявки.
+            </summary>
+            <param name="request">Модель заявки</param>
+            <returns>Созданна заявка или ошибка.</returns>
+        </member>
+        <member name="M:Application.Api.Controllers.ApplicationController.Update(System.Guid,Application.Application.Models.ApplicationApiModel)">
+            <summary>
+            Редактироание.
+            </summary>
+            <param name="id">Id заявки.</param>
+            <returns>Отредактированная заявка или ошибка.</returns>
+        </member>
+        <member name="M:Application.Api.Controllers.ApplicationController.Delete(System.Guid)">
+            <summary>
+            Удаление.
+            </summary>
+            <param name="id">Id заявки.</param>
+            <returns>Успешное удаление или ошибка.</returns>
+        </member>
+        <member name="M:Application.Api.Controllers.ApplicationController.Submit(System.Guid)">
+            <summary>
+            Отправка на рассмотрение.
+            </summary>
+            <param name="id">Id заявки.</param>
+            <returns>Успешная отправка или ошибка.</returns>
+        </member>
+        <member name="M:Application.Api.Controllers.ApplicationController.GetAfterDate(System.Nullable{System.DateTime},System.Nullable{System.DateTime})">
+            <summary>
+            Получает список заявок, отправленных после указанной даты или неотправленных и созданных ранее указанной даты.
+            </summary>
+            <param name="submittedAfter">Дата, после которой были отправлены заявки.</param>
+            <param name="unsubmittedOlder">Не поданные заявки старше даты. </param>
+            <returns>Список заявок, удовлетворяющих заданным критериям.</returns>
+        </member>
+        <member name="M:Application.Api.Controllers.ApplicationController.GetCurrentApplication(System.Guid)">
+            <summary>
+            Получение текущей не поданной заявки для указанного пользователя.
+            </summary>
+            <param name="userId">Id пользователя.</param>
+            <returns>Текущая заявка или ошибка.</returns>
+        </member>
+        <member name="M:Application.Api.Controllers.ApplicationController.GetApplicationById(System.Guid)">
+            <summary>
+            Получение заявки по id.
+            </summary>
+            <param name="id">Id заявки.</param>
+            <returns>Заявка или ошибка.</returns>
+        </member>
+        <member name="M:Application.Api.Controllers.ApplicationController.GetActivityTypes">
+            <summary>
+            Получение списка возможных типов активности.
+            </summary>
+            <returns>Список возможных типов активности.</returns>
+        </member>
+        <member name="T:Application.Application.Attributes.NotEmptyGuidAttribute">
+            <summary>
+            Проверяет, что значение поля является действительным и не пустым идентификатором GUID.
+            </summary>
+        </member>
+        <member name="M:Application.Application.Attributes.NotEmptyGuidAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Проверяет, что значение поля является действительным и не пустым идентификатором GUID.
+            </summary>
+            <param name="value">Значение, которое требуется проверить.</param>
+            <param name="validationContext">Контекст валидации.</param>
+            <returns>Результат валидации.</returns>
+        </member>
+        <member name="T:Application.Application.Attributes.NoWhitespaceAttribute">
+            <summary>
+            Проверяет, что значение поля не содержит только пробельные символы.
+            </summary>
+        </member>
+        <member name="M:Application.Application.Attributes.NoWhitespaceAttribute.IsValid(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Application.Application.Attributes.ValidActivityAttribute">
+            <summary>
+            Проверяет, что значение поля "Активность" соответствует одному из заданных значений: "Report", "MasterClass" или "Discussion".
+            </summary>
+        </member>
+        <member name="M:Application.Application.Attributes.ValidActivityAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Проверяет, что значение поля "Активность" соответствует одному из заданных значений: "Report", "MasterClass" или "Discussion".
+            </summary>
+            <param name="value">Значение поля "Активность".</param>
+            <param name="validationContext">Контекст валидации.</param>
+            <returns>Результат валидации.</returns>
+        </member>
+        <member name="T:Application.Application.Attributes.ValidGuidAttribute">
+            <summary>
+            Проверяет, что значение поля является действительным строковым представлением GUID.
+            </summary>
+        </member>
+        <member name="M:Application.Application.Attributes.ValidGuidAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Проверяет, что значение поля является действительным строковым представлением GUID.
+            </summary>
+            <param name="value">Значение поля.</param>
+            <param name="validationContext">Контекст валидации.</param>
+            <returns>Результат валидации.</returns>
+        </member>
+        <member name="T:Application.Application.Helpers.ConvertorEnum">
+            <summary>
+            Предоставляет методы для преобразования значений между строковыми представлениями и перечислениями типа активности.
+            </summary>
+        </member>
+        <member name="M:Application.Application.Helpers.ConvertorEnum.ConvertToTypeActivityEnum(System.String)">
+            <summary>
+            Преобразует строковое представление типа активности в перечисление TypeActivityApi.
+            </summary>
+            <param name="activity">Строковое представление типа активности.</param>
+            <returns>Перечисление TypeActivityApi.</returns>
+        </member>
+        <member name="M:Application.Application.Helpers.ConvertorEnum.ConvertEnumToString(Application.DataAccess.Helper.TypeActivity)">
+            <summary>
+            Преобразует перечисление типа активности в строковое представление.
+            </summary>
+            <param name="activity">Перечисление типа активности.</param>
+            <returns>Строковое представление типа активности.</returns>
+        </member>
+        <member name="T:Application.Application.Helpers.IConvertorEnum">
+            <summary>
+            Интерфейс для преобразования значений между строковыми представлениями и перечислениями типа активности.
+            </summary>
+        </member>
+        <member name="M:Application.Application.Helpers.IConvertorEnum.ConvertToTypeActivityEnum(System.String)">
+            <summary>
+            Преобразует строковое представление типа активности в перечисление TypeActivityApi.
+            </summary>
+            <param name="activity">Строковое представление типа активности.</param>
+            <returns>Перечисление TypeActivityApi.</returns>
+        </member>
+        <member name="M:Application.Application.Helpers.IConvertorEnum.ConvertEnumToString(Application.DataAccess.Helper.TypeActivity)">
+            <summary>
+            Преобразует перечисление типа активности в строковое представление.
+            </summary>
+            <param name="activity">Перечисление типа активности.</param>
+            <returns>Строковое представление типа активности.</returns>
+        </member>
+        <member name="T:Application.Application.Helpers.IMappings">
+            <summary>
+            Интерфейс для преобразования моделей между уровнями приложения.
+            </summary>
+        </member>
+        <member name="M:Application.Application.Helpers.IMappings.ToApplicationDbModel(Application.Application.Models.ApplicationApiModel)">
+            <summary>
+            Преобразует модель заявки приложения в модель заявки базы данных.
+            </summary>
+            <param name="app">Модель заявки приложения.</param>
+            <returns>Модель заявки базы данных.</returns>
+        </member>
+        <member name="M:Application.Application.Helpers.IMappings.ToApplicationRequestModel(Application.Domain.Models.ApplicationDBModel)">
+            <summary>
+            Преобразует модель заявки базы данных в модель заявки приложения.
+            </summary>
+            <param name="app">Модель заявки базы данных.</param>
+            <returns>Модель заявки приложения.</returns>
+        </member>
+        <member name="M:Application.Application.Helpers.IMappings.ToApplicationsRequestModel(System.Collections.Generic.List{Application.Domain.Models.ApplicationDBModel})">
+            <summary>
+            Преобразует список моделей заявок базы данных в список моделей заявок приложения.
+            </summary>
+            <param name="apps">Список моделей заявок базы данных.</param>
+            <returns>Список моделей заявок приложения.</returns>
+        </member>
+        <member name="T:Application.Application.Helpers.Mappings">
+            <summary>
+            Предоставляет методы для преобразования моделей между уровнями приложения.
+            </summary>
+        </member>
+        <member name="M:Application.Application.Helpers.Mappings.#ctor(Application.Application.Helpers.IConvertorEnum)">
+            <summary>
+            Инициализирует новый экземпляр класса Mappings.
+            </summary>
+            <param name="convertorEnum">Экземпляр объекта для преобразования перечислений.</param>
+        </member>
+        <member name="M:Application.Application.Helpers.Mappings.ToApplicationDbModel(Application.Application.Models.ApplicationApiModel)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Application.Application.Helpers.Mappings.ToApplicationRequestModel(Application.Domain.Models.ApplicationDBModel)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Application.Application.Helpers.Mappings.ToApplicationsRequestModel(System.Collections.Generic.List{Application.Domain.Models.ApplicationDBModel})">
+            <inheritdoc/>
+        </member>
+        <member name="T:Application.Application.Helpers.TypeActivityApi">
+            <summary>
+            Представляет типы активности для API.
+            </summary>
+        </member>
+        <member name="F:Application.Application.Helpers.TypeActivityApi.Default">
+            <summary>
+            Значение по умолчанию.
+            </summary>
+        </member>
+        <member name="F:Application.Application.Helpers.TypeActivityApi.Report">
+            <summary>
+            Доклад, 35-45 минут.
+            </summary>
+        </member>
+        <member name="F:Application.Application.Helpers.TypeActivityApi.MasterClass">
+            <summary>
+            Мастеркласс, 1-2 часа.
+            </summary>
+        </member>
+        <member name="F:Application.Application.Helpers.TypeActivityApi.Discussion">
+            <summary>
+            Дискуссия / круглый стол, 40-50 минут.
+            </summary>
+        </member>
+        <member name="T:Application.Application.Helpers.Validator">
+            <summary>
+            Предоставляет методы для валидации полей моделей заявок.
+            </summary>
+        </member>
+        <member name="M:Application.Application.Helpers.Validator.#ctor(Application.Application.Helpers.IConvertorEnum)">
+            <summary>
+            Инициализирует новый экземпляр класса Validator.
+            </summary>
+            <param name="convertorEnum">Экземпляр объекта для преобразования перечислений.</param>
+        </member>
+        <member name="M:Application.Application.Helpers.Validator.IsValidateField(Application.Application.Models.ApplicationApiModel)">
+            <summary>
+            Проверяет, являются ли поля модели заявки приложения заполненными с значениями по умолчанию.
+            </summary>
+            <param name="request">Модель заявки приложения.</param>
+            <returns>True, если поля со значениями по умолчанию; в противном случае - false.</returns>
+        </member>
+        <member name="M:Application.Application.Helpers.Validator.IsValidateFieldToSubmit(Application.Domain.Models.ApplicationDBModel)">
+            <summary>
+            Проверяет, являются ли поля модели заявки базы данных заполненными с значениями по умолчанию.
+            </summary>
+            <param name="application">Модель заявки базы данных.</param>
+            <returns>True, если поля со значениями по умолчанию; в противном случае - false.</returns>
+        </member>
+        <member name="T:Application.Application.Models.ApplicationApiModel">
+            <summary>
+            Модель для представления заявки через API.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationApiModel.Author">
+            <summary>
+            Уникальный id автора.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationApiModel.Activity">
+            <summary>
+            Тип активности.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationApiModel.Name">
+            <summary>
+            Название.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationApiModel.Description">
+            <summary>
+            Описание активности.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationApiModel.Outline">
+            <summary>
+            План выступления.
+            </summary>
+        </member>
+        <member name="T:Application.Application.Models.ApplicationRequestModel">
+            <summary>
+            Модель запроса заявки.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationRequestModel.Id">
+            <summary>
+            ID заявки.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationRequestModel.Author">
+            <summary>
+            Идентификатор пользователя.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationRequestModel.Activity">
+            <summary>
+            Тип активности.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationRequestModel.Name">
+            <summary>
+            Название заявки.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationRequestModel.Description">
+            <summary>
+            Описание заявки.
+            </summary>
+        </member>
+        <member name="P:Application.Application.Models.ApplicationRequestModel.Outline">
+            <summary>
+            Описание планируемых действий.
+            </summary>
+        </member>
+        <member name="T:Application.Contracts.ActivityDto">
+            <summary>
+            Представляет модель для активности.
+            </summary>
+        </member>
+        <member name="P:Application.Contracts.ActivityDto.Activity">
+            <summary>
+            Получает или задает строковое представление активности.
+            </summary>
+        </member>
+        <member name="P:Application.Contracts.ActivityDto.Description">
+            <summary>
+            Получает или задает описание активности.
+            </summary>
+        </member>
+        <member name="M:Application.Contracts.ActivityDto.GetDisplayName(Application.Application.Helpers.TypeActivityApi)">
+            <summary>
+            Получает отображаемое имя для указанной активности.
+            </summary>
+            <param name="activity">Тип активности.</param>
+            <returns>Отображаемое имя активности.</returns>
+        </member>
+        <member name="T:Application.DataAccess.Helper.DbConnectionStringProvider">
+            <summary>
+            Предоставляет метод для получения строки подключения к базе данных.
+            </summary>
+        </member>
+        <member name="M:Application.DataAccess.Helper.DbConnectionStringProvider.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Инициализирует новый экземпляр класса DbConnectionStringProvider.
+            </summary>
+            <param name="configuration">Конфигурация приложения.</param>
+        </member>
+        <member name="M:Application.DataAccess.Helper.DbConnectionStringProvider.GetConnectionString">
+            <summary>
+            Получает строку подключения к базе данных.
+            </summary>
+            <returns>Строка подключения к базе данных.</returns>
+        </member>
+        <member name="T:Application.DataAccess.Helper.IDbConnectionStringProvider">
+            <summary>
+            Интерфейс для предоставления строки подключения к базе данных.
+            </summary>
+        </member>
+        <member name="M:Application.DataAccess.Helper.IDbConnectionStringProvider.GetConnectionString">
+            <summary>
+            Получает строку подключения к базе данных.
+            </summary>
+            <returns>Строка подключения к базе данных.</returns>
+        </member>
+        <member name="T:Application.DataAccess.Helper.Status">
+            <summary>
+            Представляет статус заявки.
+            </summary>
+        </member>
+        <member name="F:Application.DataAccess.Helper.Status.Default">
+            <summary>
+            Значение по умолчанию.
+            </summary>
+        </member>
+        <member name="F:Application.DataAccess.Helper.Status.Draft">
+            <summary>
+            Черновик заявки.
+            </summary>
+        </member>
+        <member name="F:Application.DataAccess.Helper.Status.Sent">
+            <summary>
+            Заявка отправлена.
+            </summary>
+        </member>
+        <member name="T:Application.DataAccess.Helper.TypeActivity">
+            <summary>
+            Представляет типы активности.
+            </summary>
+        </member>
+        <member name="F:Application.DataAccess.Helper.TypeActivity.Default">
+            <summary>
+            Значение по умолчанию.
+            </summary>
+        </member>
+        <member name="F:Application.DataAccess.Helper.TypeActivity.Report">
+            <summary>
+            Доклад.
+            </summary>
+        </member>
+        <member name="F:Application.DataAccess.Helper.TypeActivity.MasterClass">
+            <summary>
+            Мастер-класс.
+            </summary>
+        </member>
+        <member name="F:Application.DataAccess.Helper.TypeActivity.Discussion">
+            <summary>
+            Дискуссия.
+            </summary>
+        </member>
+        <member name="T:Application.DataAccess.Migrations.InitDB">
+            <summary>
+            Represents a migration for initializing the database.
+            </summary>
+        </member>
+        <member name="M:Application.DataAccess.Migrations.InitDB.#ctor(Application.DataAccess.Helper.IDbConnectionStringProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Application.DataAccess.Migrations.InitDB"/> class.
+            </summary>
+            <param name="connectionStringProvider">The database connection string provider.</param>
+        </member>
+        <member name="M:Application.DataAccess.Migrations.InitDB.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Application.DataAccess.Migrations.InitDB.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Application.DataAccess.Migrations.InitDB.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:Application.DataAccess.Services.ApplicationsRepository">
+            <summary>
+            Реализация репозитория для работы с заявками.
+            </summary>
+        </member>
+        <member name="M:Application.DataAccess.Services.ApplicationsRepository.#ctor(Application.DatabaseContext)">
+            <summary>
+            Инициализирует новый экземпляр класса ApplicationsRepository.
+            </summary>
+            <param name="_databaseContext">Контекст базы данных.</param>
+        </member>
+        <member name="M:Application.DataAccess.Services.ApplicationsRepository.Add(Application.Domain.Models.ApplicationDBModel)">
+            <summary>
+            Добавляет новую заявку.
+            </summary>
+            <param name="application">Заявка для добавления.</param>
+        </member>
+        <member name="M:Application.DataAccess.Services.ApplicationsRepository.Delete(System.Guid)">
+            <summary>
+            Удаляет заявку по её идентификатору.
+            </summary>
+            <param name="id">Идентификатор заявки для удаления.</param>
+        </member>
+        <member name="M:Application.DataAccess.Services.ApplicationsRepository.GetAll">
+            <summary>
+            Получение всех заявок.
+            </summary>
+            <returns>Список всех заявок.</returns>
+        </member>
+        <member name="M:Application.DataAccess.Services.ApplicationsRepository.GetAllAfterDate(System.DateTime,Application.DataAccess.Helper.Status)">
+            <summary>
+            Получает все заявки, созданные после указанной даты.
+            </summary>
+            <param name="date">Дата, после которой созданы заявки.</param>
+            <param name="status">Статус заявок для фильтрации.</param>
+            <returns>Список заявок, соответствующих заданным критериям.</returns>
+        </member>
+        <member name="M:Application.DataAccess.Services.ApplicationsRepository.TryGetById(System.Guid)">
+            <summary>
+            Пытается получить заявку по её id.
+            </summary>
+            <param name="id">Идентификатор заявки.</param>
+            <returns>Заявка с указанным идентификатором или null, если заявка не найдена.</returns>
+        </member>
+        <member name="M:Application.DataAccess.Services.ApplicationsRepository.TryGetByUserId(System.Guid)">
+            <summary>
+            Пытается получить заявку по id пользователя.
+            </summary>
+            <param name="userId">Идентификатор пользователя.</param>
+            <returns>Заявка пользователя или null, если заявка не найдена.</returns>
+        </member>
+        <member name="M:Application.DataAccess.Services.ApplicationsRepository.Update(Application.Domain.Models.ApplicationDBModel)">
+            <summary>
+            Обновляет информацию о заявке.
+            </summary>
+            <param name="application">Обновленная информация.</param>
+        </member>
+        <member name="T:Application.DataAccess.Services.IApplicationsRepository">
+            <summary>
+            Интерфейс для работы с заявками.
+            </summary>
+        </member>
+        <member name="M:Application.DataAccess.Services.IApplicationsRepository.GetAll">
+            <summary>
+            Получение всех заявок.
+            </summary>
+            <returns>Список всех заявок.</returns>
+        </member>
+        <member name="M:Application.DataAccess.Services.IApplicationsRepository.TryGetById(System.Guid)">
+            <summary>
+            Пытается получить заявку по её id.
+            </summary>
+            <param name="id">Идентификатор заявки.</param>
+            <returns>Заявка с указанным идентификатором или null, если заявка не найдена.</returns>
+        </member>
+        <member name="M:Application.DataAccess.Services.IApplicationsRepository.TryGetByUserId(System.Guid)">
+            <summary>
+            Пытается получить заявку по id пользователя.
+            </summary>
+            <param name="userId">Идентификатор пользователя.</param>
+            <returns>Заявка пользователя или null, если заявка не найдена.</returns>
+        </member>
+        <member name="M:Application.DataAccess.Services.IApplicationsRepository.Add(Application.Domain.Models.ApplicationDBModel)">
+            <summary>
+            Добавляет новую заявку.
+            </summary>
+            <param name="application">Заявка для добавления.</param>
+        </member>
+        <member name="M:Application.DataAccess.Services.IApplicationsRepository.Update(Application.Domain.Models.ApplicationDBModel)">
+            <summary>
+            Обновляет информацию о заявке.
+            </summary>
+            <param name="application">Обновленная информация.</param>
+        </member>
+        <member name="M:Application.DataAccess.Services.IApplicationsRepository.Delete(System.Guid)">
+            <summary>
+            Удаляет заявку по её идентификатору.
+            </summary>
+            <param name="id">Идентификатор заявки для удаления.</param>
+        </member>
+        <member name="M:Application.DataAccess.Services.IApplicationsRepository.GetAllAfterDate(System.DateTime,Application.DataAccess.Helper.Status)">
+            <summary>
+            Получает все заявки, созданные после указанной даты.
+            </summary>
+            <param name="date">Дата, после которой созданы заявки.</param>
+            <param name="status">Статус заявок для фильтрации.</param>
+            <returns>Список заявок, соответствующих заданным критериям.</returns>
+        </member>
+        <member name="T:Application.DatabaseContext">
+            <summary>
+            Контекст базы данных для работы с заявками.
+            </summary>
+        </member>
+        <member name="P:Application.DatabaseContext.Applications">
+            <summary>
+            Коллекция заявок в базе данных.
+            </summary>
+        </member>
+        <member name="M:Application.DatabaseContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{Application.DatabaseContext})">
+            <summary>
+            Конструктор контекста базы данных.
+            </summary>
+            <param name="options">Параметры контекста базы данных.</param>
+        </member>
+        <member name="T:Application.Domain.Models.ApplicationDBModel">
+            <summary>
+            Модель заявки в базе данных.
+            </summary>
+        </member>
+        <member name="P:Application.Domain.Models.ApplicationDBModel.Id">
+            <summary>
+            ID заявки.
+            </summary>
+        </member>
+        <member name="P:Application.Domain.Models.ApplicationDBModel.Date">
+            <summary>
+            Дата создания заявки.
+            </summary>
+        </member>
+        <member name="P:Application.Domain.Models.ApplicationDBModel.UserId">
+            <summary>
+            Идентификатор пользователя.
+            </summary>
+        </member>
+        <member name="P:Application.Domain.Models.ApplicationDBModel.Activity">
+            <summary>
+            Тип активности.
+            </summary>
+        </member>
+        <member name="P:Application.Domain.Models.ApplicationDBModel.Name">
+            <summary>
+            Название заявки.
+            </summary>
+        </member>
+        <member name="P:Application.Domain.Models.ApplicationDBModel.Description">
+            <summary>
+            Описание заявки.
+            </summary>
+        </member>
+        <member name="P:Application.Domain.Models.ApplicationDBModel.Outline">
+            <summary>
+            Описание планируемых действий.
+            </summary>
+        </member>
+        <member name="P:Application.Domain.Models.ApplicationDBModel.Status">
+            <summary>
+            Статус заявки.
+            </summary>
+        </member>
+    </members>
+</doc>

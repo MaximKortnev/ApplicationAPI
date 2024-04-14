@@ -10,11 +10,7 @@ namespace ApplicationDB
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
-            Database.Migrate();
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseNpgsql("Host=localhost;Database=ApplicationApi;Username=postgres;Password=postgres");
+            //Database.Migrate();
+        }        
     }
-
 }
